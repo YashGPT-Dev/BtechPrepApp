@@ -1,6 +1,7 @@
 package com.yash.btechprepapp
 
 import android.os.Bundle
+import androidx.compose.runtime.*
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -50,7 +51,10 @@ fun BTechPrepApp() {
             val subjectName =
                 backStackEntry.arguments?.getString("name") ?: ""
 
-            SubjectScreen(subjectName)
+            SubjectScreen(
+                subjectName = subjectName,
+                navController = navController
+            )
         }
     }
 }
@@ -58,6 +62,9 @@ fun BTechPrepApp() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(navController: NavHostController) {
+    var searchText by remember {
+        mutableStateOf("")
+    }
 
     val subjects = listOf(
         "Data Structures",
@@ -67,6 +74,9 @@ fun HomeScreen(navController: NavHostController) {
         "Theory of Computation",
         "Software Engineering"
     )
+    val filteredSubjects = subjects.filter {
+        it.contains(searchText, ignoreCase = true)
+    }
 
     Scaffold(
         topBar = {
@@ -87,13 +97,30 @@ fun HomeScreen(navController: NavHostController) {
         ) {
 
             item {
+
+                OutlinedTextField(
+                    value = searchText,
+                    onValueChange = {
+                        searchText = it
+                    },
+                    label = {
+                        Text("Search Subject")
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                Spacer(
+                    modifier = Modifier.height(12.dp)
+                )
+            }
+            item {
                 Text(
                     text = "Computer Science Subjects",
                     fontSize = 22.sp
                 )
             }
 
-            items(subjects) { subject ->
+            items(filteredSubjects) { subject ->
 
                 Card(
                     modifier = Modifier
@@ -131,76 +158,244 @@ fun HomeScreen(navController: NavHostController) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SubjectScreen(subjectName: String) {
+fun SubjectScreen(
+    subjectName: String,
+    navController: NavHostController
+) {
+    var commentText by remember {
+        mutableStateOf("")
+    }
+
+    var comments by remember {
+
+        mutableStateOf(
+
+            listOf(
+                "Yash: Important topic for exam?",
+                "Faculty: Focus on Unit 3 and Unit 4."
+            )
+        )
+    }
+
+    var showSolution1 by remember { mutableStateOf(false) }
+    var showSolution2 by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
             TopAppBar(
                 title = {
                     Text(subjectName)
+                },
+                navigationIcon = {
+                    TextButton(
+                        onClick = {
+                            navController.popBackStack()
+                        }
+                    ) {
+                        Text("Back")
+                    }
                 }
             )
         }
     ) { padding ->
 
-        Column(
+        LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .padding(16.dp)
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
 
-            Text(
-                text = subjectName,
-                fontSize = 26.sp
-            )
+            item {
 
-            Spacer(modifier = Modifier.height(20.dp))
-
-            Card(
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(
-                    text = "📹 Videos",
-                    modifier = Modifier.padding(20.dp),
-                    fontSize = 18.sp
-                )
-            }
-
-            Spacer(modifier = Modifier.height(10.dp))
-
-            Card(
-                modifier = Modifier.fillMaxWidth()
-            ) {
                 Text(
                     text = "📄 Notes",
-                    modifier = Modifier.padding(20.dp),
-                    fontSize = 18.sp
+                    fontSize = 24.sp
                 )
             }
 
-            Spacer(modifier = Modifier.height(10.dp))
+            item {
 
-            Card(
-                modifier = Modifier.fillMaxWidth()
-            ) {
+                Card(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Column(
+                        modifier = Modifier.padding(16.dp)
+                    ) {
+
+                        Text("Unit 1 Notes")
+
+                        Text(
+                            "Author: Faculty Notes",
+                            fontSize = 12.sp
+                        )
+
+                        Button(
+                            onClick = {
+                                println("Downloading...")
+                            }
+                        ) {
+                            Text("Download")
+                        }
+                    }
+                }
+            }
+
+            item {
+
+                Card(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Column(
+                        modifier = Modifier.padding(16.dp)
+                    ) {
+
+                        Text("Unit 2 Notes")
+
+                        Text(
+                            "Author: Faculty Notes",
+                            fontSize = 12.sp
+                        )
+
+                        Button(
+                            onClick = { }
+                        ) {
+                            Text("Download")
+                        }
+                    }
+                }
+            }
+
+            item {
+
+                Spacer(modifier = Modifier.height(20.dp))
+
                 Text(
-                    text = "❓ PYQs",
-                    modifier = Modifier.padding(20.dp),
-                    fontSize = 18.sp
+                    text = "❓ Previous Year Questions",
+                    fontSize = 24.sp
                 )
             }
 
-            Spacer(modifier = Modifier.height(10.dp))
+            item {
 
-            Card(
-                modifier = Modifier.fillMaxWidth()
-            ) {
+                Card(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+
+                    Column(
+                        modifier = Modifier.padding(16.dp)
+                    ) {
+
+                        Text(
+                            "2024: Explain Binary Search Algorithm."
+                        )
+
+                        TextButton(
+                            onClick = {
+                                showSolution1 = !showSolution1
+                            }
+                        ) {
+                            Text("View Solution")
+                        }
+
+                        if (showSolution1) {
+
+                            Text(
+                                "Binary Search works on sorted arrays and reduces search space by half in every iteration."
+                            )
+                        }
+                    }
+                }
+            }
+
+
+            item {
+
+                Card(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+
+                    Column(
+                        modifier = Modifier.padding(16.dp)
+                    ) {
+
+                        Text(
+                            "2023: What is Time Complexity?"
+                        )
+
+                        TextButton(
+                            onClick = {
+                                showSolution2 = !showSolution2
+                            }
+                        ) {
+                            Text("View Solution")
+                        }
+
+                        if (showSolution2) {
+
+                            Text(
+                                "Time Complexity measures the amount of time an algorithm takes relative to input size."
+                            )
+                        }
+                    }
+                }
+            }
+            item {
+
+                Spacer(
+                    modifier = Modifier.height(20.dp)
+                )
+
                 Text(
                     text = "💬 Discussions",
-                    modifier = Modifier.padding(20.dp),
-                    fontSize = 18.sp
+                    fontSize = 24.sp
                 )
+            }
+            items(comments) { comment ->
+
+                Card(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+
+                    Text(
+                        text = comment,
+                        modifier = Modifier.padding(16.dp)
+                    )
+                }
+            }
+            item {
+
+                OutlinedTextField(
+                    value = commentText,
+                    onValueChange = {
+                        commentText = it
+                    },
+                    label = {
+                        Text("Add Comment")
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                Spacer(
+                    modifier = Modifier.height(8.dp)
+                )
+
+                Button(
+                    onClick = {
+
+                        if (commentText.isNotBlank()) {
+
+                            comments =
+                                comments + "Student: $commentText"
+
+                            commentText = ""
+                        }
+                    }
+                ) {
+
+                    Text("Send")
+                }
             }
         }
     }
