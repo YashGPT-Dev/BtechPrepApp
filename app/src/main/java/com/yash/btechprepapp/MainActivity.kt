@@ -12,9 +12,12 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.NavHostController
 import androidx.compose.material3.ExperimentalMaterial3Api
 
 class MainActivity : ComponentActivity() {
@@ -28,10 +31,33 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+@Composable
+fun BTechPrepApp() {
+
+    val navController = rememberNavController()
+
+    NavHost(
+        navController = navController,
+        startDestination = "home"
+    ) {
+
+        composable("home") {
+            HomeScreen(navController)
+        }
+
+        composable("subject/{name}") { backStackEntry ->
+
+            val subjectName =
+                backStackEntry.arguments?.getString("name") ?: ""
+
+            SubjectScreen(subjectName)
+        }
+    }
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BTechPrepApp() {
+fun HomeScreen(navController: NavHostController) {
 
     val subjects = listOf(
         "Data Structures",
@@ -72,7 +98,9 @@ fun BTechPrepApp() {
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clickable { },
+                        .clickable {
+                            navController.navigate("subject/$subject")
+                        },
                     elevation = CardDefaults.cardElevation(5.dp)
                 ) {
 
@@ -96,6 +124,83 @@ fun BTechPrepApp() {
                         )
                     }
                 }
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SubjectScreen(subjectName: String) {
+
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text(subjectName)
+                }
+            )
+        }
+    ) { padding ->
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+                .padding(16.dp)
+        ) {
+
+            Text(
+                text = subjectName,
+                fontSize = 26.sp
+            )
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            Card(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    text = "📹 Videos",
+                    modifier = Modifier.padding(20.dp),
+                    fontSize = 18.sp
+                )
+            }
+
+            Spacer(modifier = Modifier.height(10.dp))
+
+            Card(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    text = "📄 Notes",
+                    modifier = Modifier.padding(20.dp),
+                    fontSize = 18.sp
+                )
+            }
+
+            Spacer(modifier = Modifier.height(10.dp))
+
+            Card(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    text = "❓ PYQs",
+                    modifier = Modifier.padding(20.dp),
+                    fontSize = 18.sp
+                )
+            }
+
+            Spacer(modifier = Modifier.height(10.dp))
+
+            Card(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    text = "💬 Discussions",
+                    modifier = Modifier.padding(20.dp),
+                    fontSize = 18.sp
+                )
             }
         }
     }
